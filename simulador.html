@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#102d27">
+    <title>CONFIAR | Simulador de Fe</title>
+    <style>
+        :root {
+            --verde: #102d27;
+            --verde-secundario: #1d4639;
+            --verde-claro: #315f4b;
+            --dorado: #d6b878;
+            --crema: #f5f1e7;
+            --blanco: #ffffff;
+            --texto: #263b32;
+            --gris: #77847b;
+            --borde: #e3e8df;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: var(--crema);
+            color: var(--texto);
+            font-family: Arial, Helvetica, sans-serif;
+            line-height: 1.6;
+            overflow: hidden; /* Oculta el scroll vertical del body */
+        }
+
+        button, a { font: inherit; }
+        a { text-decoration: none; color: inherit; }
+        button { cursor: pointer; }
+
+        /* NAVEGACIÓN - Fija en la parte superior */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 8%;
+            background: rgba(255,255,255,.96);
+            border-bottom: 1px solid var(--borde);
+        }
+
+        .logo {
+            color: var(--verde);
+            font-size: 1.5rem;
+            font-weight: 900;
+            letter-spacing: 3px;
+        }
+        .logo span { color: var(--dorado); }
+
+        .navigation { display: flex; gap: 35px; }
+        .navigation a {
+            color: var(--gris);
+            font-size: .9rem;
+            font-weight: bold;
+            transition: color .3s;
+        }
+        .navigation a:hover { color: var(--verde-claro); }
+
+        /* CONTENEDOR HORIZONTAL */
+        .horizontal-scroll {
+            display: flex;
+            width: 100vw;
+            height: 100vh;
+            overflow-x: auto;
+            overflow-y: hidden;
+            scroll-snap-type: x mandatory;
+            scroll-behavior: smooth;
+        }
+
+        .horizontal-scroll > section, 
+        .horizontal-scroll > footer {
+            flex: 0 0 100vw;
+            height: 100vh;
+            scroll-snap-align: start;
+            overflow-y: auto; /* Permite scroll interno si el contenido es muy largo */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding-top: 80px; /* Compensa el header fijo */
+        }
+
+        /* PORTADA */
+        .hero {
+            align-items: center;
+            text-align: center;
+            color: white;
+            background:
+                linear-gradient(rgba(10, 35, 29, .88), rgba(10, 35, 29, .92)),
+                radial-gradient(circle at top right, #64846c, transparent 50%),
+                var(--verde);
+        }
+        .hero-content { max-width: 850px; padding: 0 20px; }
+        .hero-symbol {
+            color: var(--dorado);
+            display: flex;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+        .hero-symbol svg { width: 48px; height: 48px; }
+
+        .eyebrow {
+            display: inline-block;
+            margin-bottom: 22px;
+            color: var(--dorado);
+            font-size: .78rem;
+            font-weight: bold;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+        }
+        .hero h1 {
+            font-family: Georgia, serif;
+            font-size: clamp(3rem, 8vw, 6rem);
+            font-weight: normal;
+            line-height: 1.1;
+            margin-bottom: 25px;
+        }
+        .hero h1 span { color: var(--dorado); font-style: italic; }
+        .hero p {
+            max-width: 620px;
+            margin: auto auto 35px;
+            color: #d6e0d8;
+            font-size: 1.1rem;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 14px 30px;
+            border: none;
+            border-radius: 5px;
+            background: var(--dorado);
+            color: var(--verde);
+            font-weight: bold;
+            transition: .3s;
+        }
+        .button:hover { background: white; transform: translateY(-3px); }
+        .button-dark { background: var(--verde); color: white; }
+        .button-dark:hover { background: var(--verde-claro); }
+
+        /* SECCIONES GENERALES */
+        .section-inner {
+            width: min(1100px, 90%);
+            margin: auto;
+        }
+        .section-heading {
+            max-width: 650px;
+            margin: 0 auto 55px;
+            text-align: center;
+        }
+        .section-heading .eyebrow { color: var(--verde-claro); }
+        .section-heading h2 {
+            margin-bottom: 15px;
+            color: var(--verde);
+            font-family: Georgia, serif;
+            font-size: clamp(2rem, 5vw, 3.3rem);
+            font-weight: normal;
+        }
+        .section-heading p { color: var(--gris); }
+
+        /* PILARES */
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+        }
+        .card {
+            padding: 35px 28px;
+            background: white;
+            border: 1px solid var(--borde);
+            border-radius: 8px;
+            transition: .3s;
+        }
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 18px 40px rgba(16,45,39,.09);
+        }
+        .card-icon {
+            width: 65px;
+            height: 65px;
+            display: grid;
+            place-items: center;
+            margin-bottom: 25px;
+            border-radius: 50%;
+            background: #edf2e9;
+            color: var(--verde-claro);
+        }
+        .card-icon svg { width: 32px; height: 32px; }
+        .card h3 {
+            margin-bottom: 12px;
+            color: var(--verde);
+            font-family: Georgia, serif;
+            font-size: 1.5rem;
+        }
+        .card p { color: var(--gris); font-size: .95rem; }
+
+        /* SIMULADOR */
+        .simulator-section { background: #e9eee6; }
+        .simulator {
+            width: min(850px, 100%);
+            margin: auto;
+            padding: 50px;
+            border-radius: 12px;
+            background: white;
+            box-shadow: 0 20px 60px rgba(16,45,39,.08);
+        }
+        .simulator .section-heading { margin-bottom: 40px; }
+        .question {
+            margin-bottom: 20px;
+            color: var(--verde);
+            font-weight: bold;
+            font-size: 1.05rem;
+        }
+        .choices {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+        .choice {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            min-height: 90px;
+            padding: 20px;
+            border: 1px solid var(--borde);
+            border-radius: 8px;
+            background: #fcfcfa;
+            color: var(--texto);
+            text-align: left;
+            transition: .3s;
+        }
+        .choice:hover { border-color: var(--verde-claro); background: #f0f5ee; }
+        .choice[aria-pressed="true"] {
+            border: 2px solid var(--verde-claro);
+            background: #e8f0e6;
+        }
+        .svg-icon {
+            width: 32px;
+            height: 32px;
+            color: var(--verde-claro);
+            flex-shrink: 0;
+        }
+        .actions {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 30px;
+        }
+        .hint { color: var(--gris); font-size: .9rem; }
+        button:disabled { cursor: not-allowed; opacity: .5; }
+
+        /* RESULTADOS */
+        .result {
+            margin-top: 35px;
+            padding: 35px;
+            border-radius: 8px;
+            background: var(--verde);
+            color: white;
+            animation: aparecer .5s ease;
+        }
+        .result[hidden] { display: none; }
+        @keyframes aparecer {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .result-label {
+            margin-bottom: 12px;
+            color: var(--dorado);
+            font-size: .8rem;
+            font-weight: bold;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+        .result h3 {
+            margin-bottom: 15px;
+            font-family: Georgia, serif;
+            font-size: 2rem;
+            font-weight: normal;
+        }
+        .result-message { color: #d9e3da; }
+        .verse {
+            margin: 25px 0 15px;
+            padding-left: 20px;
+            border-left: 3px solid var(--dorado);
+            color: #f6e9c9;
+            font-family: Georgia, serif;
+            font-size: 1.2rem;
+        }
+        .reference { color: #b9c9bc; font-size: .85rem; }
+        .result-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 25px; }
+
+        /* REFLEXIÓN */
+        .reflection { text-align: center; background: white; }
+        .reflection .symbol {
+            margin-bottom: 20px;
+            color: var(--dorado);
+            display: flex;
+            justify-content: center;
+        }
+        .reflection .symbol svg { width: 48px; height: 48px; }
+        .reflection blockquote {
+            max-width: 800px;
+            margin: auto;
+            color: var(--verde);
+            font-family: Georgia, serif;
+            font-size: clamp(1.8rem, 5vw, 3rem);
+            line-height: 1.4;
+        }
+        .reflection p { margin-top: 25px; color: var(--gris); font-weight: bold; }
+
+        /* FOOTER */
+        footer {
+            background: var(--verde) !important;
+            color: #d5e0d7;
+            text-align: center;
+            align-items: center;
+        }
+        .footer-inner { max-width: 600px; margin: auto; padding: 0 20px; }
+        footer h3 {
+            margin-bottom: 10px;
+            color: var(--dorado);
+            letter-spacing: 4px;
+        }
+        footer p { font-size: .95rem; margin-bottom: 10px;}
+
+        /* RESPONSIVE */
+        @media (max-width: 750px) {
+            .header { padding: 15px; flex-direction: column; gap: 10px; position: absolute;}
+            .horizontal-scroll > section { padding-top: 100px; }
+            .navigation { justify-content: center; gap: 18px; flex-wrap: wrap; }
+            .cards { grid-template-columns: 1fr; }
+            .choices { grid-template-columns: 1fr; }
+            .simulator { padding: 25px 18px; }
+            .actions { align-items: stretch; flex-direction: column; }
+            .actions .button { text-align: center; }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="header">
+        <a href="#inicio" class="logo">✦ <span>CONFIAR</span></a>
+        <nav class="navigation" aria-label="Navegación principal">
+            <a href="#pilares">Pilares</a>
+            <a href="#simulador">Simulador</a>
+            <a href="#reflexion">Reflexión</a>
+        </nav>
+    </header>
+
+    <main class="horizontal-scroll" id="scroll-container">
+
+        <!-- PORTADA -->
+        <section class="hero" id="inicio">
+            <div class="hero-content">
+                <div class="hero-symbol">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg>
+                </div>
+                <span class="eyebrow">Un momento para el alma</span>
+                <h1>Encuentra paz<br>en tu <span>camino.</span></h1>
+                <p>Haz una pausa, reconoce lo que estás sintiendo y encuentra una palabra de esperanza para acompañarte en cada momento de tu vida.</p>
+                <a href="#simulador" class="button">Comenzar simulador →</a>
+            </div>
+        </section>
+
+        <!-- PILARES -->
+        <section class="section" id="pilares">
+            <div class="section-inner">
+                <div class="section-heading">
+                    <span class="eyebrow">Tres recordatorios</span>
+                    <h2>Una fe que te acompaña</h2>
+                    <p>En cada etapa de la vida existen razones para seguir adelante, encontrar paz y mantener la esperanza.</p>
+                </div>
+                <div class="cards">
+                    <article class="card">
+                        <div class="card-icon">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                        </div>
+                        <h3>Protección</h3>
+                        <p>Recuerda que no tienes que enfrentar cada dificultad sin esperanza ni apoyo.</p>
+                    </article>
+                    <article class="card">
+                        <div class="card-icon">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+                        </div>
+                        <h3>Refugio</h3>
+                        <p>Regálate un momento de calma para respirar, reflexionar y encontrar consuelo.</p>
+                    </article>
+                    <article class="card">
+                        <div class="card-icon">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path></svg>
+                        </div>
+                        <h3>Propósito</h3>
+                        <p>Aunque no tengas todas las respuestas, puedes dar el siguiente paso con paciencia y confianza.</p>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <!-- SIMULADOR -->
+        <section class="simulator-section" id="simulador">
+            <div class="simulator">
+                <div class="section-heading">
+                    <span class="eyebrow">Simulador de fe</span>
+                    <h2>¿Cómo te sientes hoy?</h2>
+                    <p>Cada emoción representa una experiencia diferente. Selecciona la que mejor describa tu momento actual.</p>
+                </div>
+                <p class="question" id="question-label">Selecciona una emoción:</p>
+                <div class="choices" role="group" aria-labelledby="question-label">
+                    <button class="choice" type="button" data-feeling="ansiedad" aria-pressed="false">
+                        <svg class="svg-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path></svg>
+                        <span>Estoy preocupado o con ansiedad</span>
+                    </button>
+                    <button class="choice" type="button" data-feeling="tristeza" aria-pressed="false">
+                        <svg class="svg-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                        <span>Me siento triste o desanimado</span>
+                    </button>
+                    <button class="choice" type="button" data-feeling="incertidumbre" aria-pressed="false">
+                        <svg class="svg-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                        <span>No sé qué decisión tomar</span>
+                    </button>
+                    <button class="choice" type="button" data-feeling="fortaleza" aria-pressed="false">
+                        <svg class="svg-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg>
+                        <span>Necesito fuerzas para continuar</span>
+                    </button>
+                </div>
+                <div class="actions">
+                    <p class="hint" id="hint" aria-live="polite">Selecciona una opción para continuar.</p>
+                    <button class="button button-dark" id="show-result" type="button" disabled>Ver mi reflexión →</button>
+                </div>
+                
+                <section class="result" id="result" aria-live="polite" aria-atomic="true" hidden>
+                    <p class="result-label">Una palabra para ti</p>
+                    <h3 id="result-title"></h3>
+                    <p class="result-message" id="result-message"></p>
+                    <blockquote class="verse" id="result-verse"></blockquote>
+                    <p class="reference" id="result-reference"></p>
+                    <div class="result-actions">
+                        <button class="button" id="try-again" type="button">Elegir otra emoción</button>
+                        <button class="button" id="copy-result" type="button">Copiar reflexión</button>
+                    </div>
+                    <p id="copy-status" class="reference" aria-live="polite"></p>
+                </section>
+            </div>
+        </section>
+
+        <!-- REFLEXIÓN FINAL -->
+        <section class="reflection" id="reflexion">
+            <div class="section-inner">
+                <div class="symbol">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg>
+                </div>
+                <blockquote>«El Señor es mi pastor, nada me falta».</blockquote>
+                <p>Salmo 23, 1</p>
+            </div>
+        </section>
+
+        <!-- PIE DE PÁGINA -->
+        <footer>
+            <div class="footer-inner">
+                <h3>CONFIAR</h3>
+                <p>Un espacio para la reflexión, la esperanza y la fe.</p>
+                <p>Dedica un momento a la calma y recuerda que cada paso cuenta.</p>
+            </div>
+        </footer>
+
+    </main>
+
+    <script>
+        // Funcionalidad para navegar de forma horizontal al hacer clic en los enlaces
+        document.querySelectorAll('.navigation a, .hero a').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href').substring(1);
+                const targetElement = document.getElementById(targetId);
+                const container = document.getElementById('scroll-container');
+                
+                container.scrollTo({
+                    left: targetElement.offsetLeft,
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Script original modificado ligeramente para manejar scrollIntoView en contenedor horizontal
+        const reflections = {
+            ansiedad: {
+                title: "Respira y confía",
+                message: "No tienes que resolverlo todo en este instante. Haz una pausa, respira con calma y avanza paso a paso. Si la preocupación pesa demasiado, hablar con alguien de confianza también puede ayudarte.",
+                verse: "«No se inquieten por nada; más bien, en toda ocasión, con oración y ruego, presenten sus peticiones a Dios».",
+                reference: "Filipenses 4, 6. Verifica la redacción en tu Biblia."
+            },
+            tristeza: {
+                title: "No estás sin esperanza",
+                message: "Está bien reconocer la tristeza y darte tiempo. No necesitas fingir que todo está bien. Busca compañía si la necesitas y recuerda que los momentos difíciles no definen toda tu historia.",
+                verse: "«El Señor está cerca de los que tienen el corazón herido».",
+                reference: "Salmo 34, 18. La redacción varía según la traducción."
+            },
+            incertidumbre: {
+                title: "Da un paso a la vez",
+                message: "No siempre es posible ver el camino completo. Puedes detenerte, buscar consejo y tomar una decisión a la vez, con paciencia y reflexión.",
+                verse: "«Confía en el Señor con todo tu corazón».",
+                reference: "Proverbios 3, 5. Consulta tu traducción bíblica preferida."
+            },
+            fortaleza: {
+                title: "Sigue adelante con paciencia",
+                message: "No tienes que poder con todo por tu cuenta. Descansar, pedir ayuda y retomar fuerzas también son parte del camino. Concéntrate en el siguiente paso posible.",
+                verse: "«Todo lo puedo en aquel que me fortalece».",
+                reference: "Filipenses 4, 13. Lee el pasaje completo en su contexto."
+            }
+        };
+
+        const choices = document.querySelectorAll(".choice");
+        const showButton = document.getElementById("show-result");
+        const result = document.getElementById("result");
+        const hint = document.getElementById("hint");
+
+        let selectedFeeling = null;
+        let currentReflection = null;
+
+        choices.forEach(function(choice) {
+            choice.addEventListener("click", function() {
+                selectedFeeling = choice.dataset.feeling;
+                choices.forEach(function(item) {
+                    item.setAttribute("aria-pressed", String(item === choice));
+                });
+                showButton.disabled = false;
+                result.hidden = true;
+                hint.textContent = "Opción seleccionada. Ya puedes ver tu reflexión.";
+            });
+        });
+
+        showButton.addEventListener("click", function() {
+            if (!selectedFeeling) return;
+            currentReflection = reflections[selectedFeeling];
+            document.getElementById("result-title").textContent = currentReflection.title;
+            document.getElementById("result-message").textContent = currentReflection.message;
+            document.getElementById("result-verse").textContent = currentReflection.verse;
+            document.getElementById("result-reference").textContent = currentReflection.reference;
+            document.getElementById("copy-status").textContent = "";
+            result.hidden = false;
+            
+            // Scroll interno de la sección en caso de que quede muy larga verticalmente
+            result.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        });
+
+        document.getElementById("try-again").addEventListener("click", function() {
+            selectedFeeling = null;
+            currentReflection = null;
+            choices.forEach(function(item) {
+                item.setAttribute("aria-pressed", "false");
+            });
+            showButton.disabled = true;
+            result.hidden = true;
+            hint.textContent = "Selecciona una opción para continuar.";
+        });
+
+        document.getElementById("copy-result").addEventListener("click", async function() {
+            if (!currentReflection) return;
+            const textToCopy = currentReflection.title + "\n\n" +
+                currentReflection.message + "\n\n" +
+                currentReflection.verse + "\n" +
+                currentReflection.reference;
+            const status = document.getElementById("copy-status");
+            try {
+                await navigator.clipboard.writeText(textToCopy);
+                status.textContent = "Reflexión copiada correctamente.";
+            } catch (error) {
+                status.textContent = "No se pudo copiar automáticamente. Copia el texto manualmente.";
+            }
+        });
+    </script>
+
+</body>
+</html>
